@@ -1,0 +1,6 @@
+{
+  "id": 0,
+  "title": "$title",
+  "dueDate": "$dueDate",
+  "completed": "$completed"
+}
