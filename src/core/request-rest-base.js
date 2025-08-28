@@ -47,7 +47,7 @@ export default class RequestRestBase {
         this.cookies = {};
         this.queryParameters = {};
         this.formParameters = {};
-        this.authenticationType = 'BEARER';
+        // this.authenticationType = 'BEARER';
         this.authenticationUser = null;
         this.authenticationPassword = null;
         this.tag = null;
@@ -103,7 +103,7 @@ export default class RequestRestBase {
             timeout: this.timeout,
             authenticationUser: this.authenticationUser,
             authenticationPassword: this.authenticationPassword,
-            authenticationType: this.authenticationType
+            // authenticationType: this.authenticationType
         });
 
         return this._executeRequest(session);
