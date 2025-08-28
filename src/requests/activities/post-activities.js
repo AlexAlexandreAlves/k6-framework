@@ -1,24 +1,26 @@
-import RequesRestBase from "../../core/request-rest-base.js";
+import RequestRestBase from "../../core/request-rest-base.js";
 
 const url = __ENV.BASE_URL;
-const template = open('../../json-objects/activities/post-activities.json');
 
-export default class PostEnvioActivities extends RequesRestBase {
+var template = open('../../json-objects/activities/post-activities.json');
+
+export default class SendActivities extends RequestRestBase {
+
     constructor() {
         super();
-        // this.baseUrl = url;
-        this.endpoint = 'https://fakerestapi.azurewebsites.net/api/v1/Activities';
+        this.url = url;
+        // this.requestService = `/api/v1/Activities`;
+        this.requestService = `https://fakerestapi.azurewebsites.net/api/v1/Activities`;
         this.setMethod('POST');
-        this.tag = 'PostEnvioActivities';
+        this.tag = 'SendActivities';
     }
 
-   setJsonBodyFromTemplate(id, title, dueDate, completed) {
-        // Crie uma cópia do template
+    setJsonBodyFromTemplate(id, title, dueDate, completed) {
         const body = { ...template };
         body.id = id;
         body.title = title;
         body.dueDate = dueDate;
         body.completed = completed;
-        this.jsonBody = JSON.stringify(body); // Envie como string JSON
+        this.jsonBody = JSON.stringify(body);
     }
 }

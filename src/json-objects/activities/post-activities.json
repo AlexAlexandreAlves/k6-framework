@@ -1,6 +1,6 @@
 {
   "id": 0,
-  "title": "title",
-  "dueDate": "2025/01/01",
-  "completed": "true"
+  "title": "$title",
+  "dueDate": "$dueDate",
+  "completed": "$completed"
 }

@@ -35,19 +35,18 @@ function createApiClient(config) {
 
 export default class RequestRestBase {
     constructor() {
-        this.baseUrl = null;
-        this.timeout = 2000;
-        this.endpoint = null; 
+        this.url = null;
+        this.requestService = null;
         this.method = null;
         this.jsonBody = null;
         this.file = null;
         this.fileName = null;
         this.fileType = null;
-        this.headers = {};
+        this.headers = { 'Content-Type': 'application/json; charset=utf-8' };
         this.cookies = {};
         this.queryParameters = {};
         this.formParameters = {};
-        // this.authenticationType = 'BEARER';
+        this.authenticationType = 'BEARER';
         this.authenticationUser = null;
         this.authenticationPassword = null;
         this.tag = null;
@@ -59,6 +58,7 @@ export default class RequestRestBase {
 
     setFormParameters(parameters) {
         this.formParameters = parameters;
+        this.headers['Content-Type'] = 'application/x-www-form-urlencoded';
     }
 
     removeHeader(header) {
@@ -73,28 +73,6 @@ export default class RequestRestBase {
         delete this.queryParameters[parameter];
     }
 
-    _buildRequestOptions() {
-        const options = {
-            headers: { ...this.headers },
-            cookies: this.cookies,
-            params: this.queryParameters,
-        };
-
-        if (this.file) {
-            options.files = {
-                [this.fileName]: http.file(this.file, this.fileName, this.fileType)
-            };
-            options.headers['Content-Type'] = this.fileType || 'multipart/form-data';
-        } else if (this.jsonBody) {
-            options.body = this.jsonBody;
-            options.headers['Content-Type'] = 'application/json; charset=utf-8';
-        } else if (Object.keys(this.formParameters).length > 0) {
-            options.body = this.formParameters;
-            options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-        }
-
-        return options;
-    }
 
     executeRequest() {
         const session = createApiClient({
@@ -103,27 +81,70 @@ export default class RequestRestBase {
             timeout: this.timeout,
             authenticationUser: this.authenticationUser,
             authenticationPassword: this.authenticationPassword,
-            // authenticationType: this.authenticationType
+            authenticationType: this.authenticationType
         });
 
         return this._executeRequest(session);
     }
 
-   // ...existing code...
     _executeRequest(session) {
-        const options = this._buildRequestOptions();
-        const tags = { tags: { name: this.tag } };
-        const methodMap = {
-            GET: () => session.get(this.endpoint, options, tags),
-            POST: () => session.post(this.endpoint, options.body, options.headers, tags),
-            PUT: () => session.put(this.endpoint, options.body, options.headers, tags),
-            DELETE: () => session.delete(this.endpoint, null, options.headers, tags),
+        let requestOptions = {
+            headers: { ...this.headers },
+            cookies: this.cookies,
+            params: this.queryParameters
         };
 
-        if (!methodMap[this.method]) {
-            throw new Error(`HTTP method ${this.method} not implemented!`);
+        let body;
+
+        // Prioridade: formParameters > jsonBody > file
+        if (Object.keys(this.formParameters).length > 0) {
+            body = this.formParameters;
+            requestOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        } else if (this.jsonBody) {
+            body = this.jsonBody;
+            requestOptions.headers['Content-Type'] = 'application/json; charset=utf-8';
+        } else if (this.file) {
+            body = {};
+            requestOptions.files = {};
+            requestOptions.files[this.fileName] = http.file(this.file, this.fileName, this.fileType);
+            // Content-Type será definido automaticamente pelo k6 para multipart
         }
-        return methodMap[this.method]();
+
+        let res;
+
+        switch (this.method) {
+            case 'GET':
+                res = session.get(this.requestService, requestOptions, {
+                    tags: { name: this.tag }
+                });
+                break;
+            case 'POST':
+                res = session.post(this.requestService, body, {
+                    headers: requestOptions.headers,
+                    cookies: requestOptions.cookies,
+                    params: requestOptions.params,
+                    tags: { name: this.tag }
+                });
+                break;
+            case 'PUT':
+                res = session.put(this.requestService, body, {
+                    headers: requestOptions.headers,
+                    cookies: requestOptions.cookies,
+                    params: requestOptions.params,
+                    tags: { name: this.tag }
+                });
+                break;
+            case 'DELETE':
+                res = session.delete(this.requestService, null, {
+                    headers: requestOptions.headers,
+                    cookies: requestOptions.cookies,
+                    params: requestOptions.params,
+                    tags: { name: this.tag }
+                });
+                break;
+            default:
+                throw new Error(`HTTP method ${this.method} not implemented!`);
+        }
+        return res;
     }
-// ...existing code...
 }
