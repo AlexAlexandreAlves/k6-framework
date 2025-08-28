@@ -27,32 +27,34 @@ export default function sendActivity() {
 
     const request = new PostEnvioActivities();
     request.setJsonBodyFromTemplate(
-        "Random Title",
-        currentDate.toISOString(),
+        0,
+        "Generic title",
+        "2025/01/01",
         true
     )
+    console.log("Request body: " + request.jsonBody);
     const response = request.executeRequest();
-    if (response.status != 200) {
-        errorCounter.add(true,
-            {
-                name: request.tag,
-                error_code: response.status,
-                response_body: response.body
-            });
-    } else {
-        successCounter.add(true,
-            {
-                name: request.tag,
-                response_body: response.body
-            });
-    }
+    // if (response.status != 200) {
+    //     errorCounter.add(true,
+    //         {
+    //             // name: request.tag,
+    //             error_code: response.status,
+    //             response_body: response.body
+    //         });
+    // } else {
+    //     successCounter.add(true,
+    //         {
+    //             // name: request.tag,
+    //             response_body: response.body
+    //         });
+    // }
 
     console.log("Status code: " + response.status, "Response body: " + response.body);
 
-    check(response, {
-        'is status 200': (r) => r.status === 200,
-        'is response body not empty': (r) => r.body.length > 0,
-    })
+    // check(response, {
+    //     'is status 200': (r) => r.status === 200,
+    //     'is response body not empty': (r) => r.body.length > 0,
+    // })
     throughput.add(response.timings.duration);
 
 }

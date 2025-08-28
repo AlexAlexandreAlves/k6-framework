@@ -109,14 +109,15 @@ export default class RequestRestBase {
         return this._executeRequest(session);
     }
 
+   // ...existing code...
     _executeRequest(session) {
         const options = this._buildRequestOptions();
         const tags = { tags: { name: this.tag } };
         const methodMap = {
             GET: () => session.get(this.endpoint, options, tags),
-            POST: () => session.post(this.endpoint, options.body, tags),
-            PUT: () => session.put(this.endpoint, options.body, tags),
-            DELETE: () => session.delete(this.endpoint, null, tags),
+            POST: () => session.post(this.endpoint, options.body, options.headers, tags),
+            PUT: () => session.put(this.endpoint, options.body, options.headers, tags),
+            DELETE: () => session.delete(this.endpoint, null, options.headers, tags),
         };
 
         if (!methodMap[this.method]) {
@@ -124,4 +125,5 @@ export default class RequestRestBase {
         }
         return methodMap[this.method]();
     }
+// ...existing code...
 }
