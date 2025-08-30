@@ -3,7 +3,7 @@ import { expect } from 'https://jslib.k6.io/k6-testing/0.5.0/index.js';
 import { Counter } from 'k6/metrics';
 import { Trend } from 'k6/metrics';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import SendActivities from '../../requests/activities/post-activities.js';
+import GetActivities from '../../requests/activities/get-activities.js';
 
 export let options = {
     scenarios: {
@@ -18,7 +18,6 @@ export let options = {
     }
 }
 
-// Custom Metric
 const errorCounter = new Counter('errors');
 const successCounter = new Counter('success');
 const throughput = new Trend('throughput');
@@ -30,19 +29,11 @@ const receiveTime = new Trend('receive_time');
 const responseBodySize = new Trend('response_body_size');
 const requestBodySize = new Trend('request_body_size');
 
-export default function sendActivity() {
+export default function getActivity() {
 
-    const currentDate = new Date();
-    const request = new SendActivities();
-
-    request.setJsonBodyFromTemplate(
-        0,
-        "Generic title",
-        currentDate,
-        true
-    )
-
+    const request = new GetActivities();
     const response = request.executeRequest();
+
     if (response.status != 200) {
         let responseBody = response.body ? response.body : "";
         errorCounter.add(true,
@@ -56,28 +47,21 @@ export default function sendActivity() {
     }
 
 
-    // Additional metrics
     throughput.add(response.timings.duration);
-    latency.add(response.timings.waiting); // waiting time (latency)
-    ttfb.add(response.timings.receiving); // time to first byte (TTFB)
-    connectTime.add(response.timings.connecting); // connection time
-    sendTime.add(response.timings.sending); // request sending time
-    receiveTime.add(response.timings.receiving); // response receiving time
-    responseBodySize.add(response.body ? response.body.length : 0); // response body size
-    requestBodySize.add(request.jsonBody ? request.jsonBody.length : 0); // request body size
+    latency.add(response.timings.waiting);
+    ttfb.add(response.timings.receiving);
+    connectTime.add(response.timings.connecting);
+    sendTime.add(response.timings.sending);
+    receiveTime.add(response.timings.receiving);
+    responseBodySize.add(response.body ? response.body.length : 0);
+    requestBodySize.add(request.jsonBody ? request.jsonBody.length : 0);
 
-    // Log the status code and response body example
-    console.log("Status code: " + response.status, "Response body: " + response.body);
-
-    // expected assertions
     expect(response.status).toEqual(200);
-    // check assert example
     check(response, {
         'Body is not null': (r) => r.body != null,
     });
 };
 
-// Another metric assert example
 export function handleSummary(data) {
     const p95 = data.metrics.latency ? data.metrics.latency['p(95)'] : null;
 
