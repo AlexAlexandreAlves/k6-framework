@@ -1,5 +1,5 @@
 import { SharedArray } from "k6/data";
-import papaparse from 'https://jslib.k6.io/papaparse/5.3.1/index.js';
+import papaparse from 'https://jslib.k6.io/papaparse/5.1.1/index.js';
 
 export default class Utils {
 

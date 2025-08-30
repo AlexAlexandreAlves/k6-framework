@@ -30,6 +30,23 @@ calendar-date-automation-test
 └── README.md
 ```
 
+## Architecture
+
+This framework uses the [HTTPX library](https://jslib.k6.io/httpx/) for advanced HTTP client features, such as session management, custom headers, and flexible authentication.  
+The base class (`src/core/request-rest-base.js`) is designed to support both the native k6 `http` module and HTTPX, allowing you to switch between them depending on your testing needs.
+
+- **HTTPX Advantages:**  
+  - Session persistence across requests  
+  - Advanced cookie and header handling  
+  - Support for custom authentication flows  
+  - Useful for complex API automation scenarios
+
+- **k6 HTTP Module:**  
+  - Full integration with k6 metrics and reporting  
+  - Recommended for standard load and performance testing
+
+You can easily adapt the framework to use either client by modifying the base class.
+
 ## Main Components
 
 - src/core/request-rest-base.js
@@ -74,3 +91,4 @@ After execution, an HTML report is automatically generated (e.g., report.html).
 ## References
 - k6 Documentation
 - k6 Reporter
+-
