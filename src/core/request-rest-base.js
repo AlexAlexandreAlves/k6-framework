@@ -1,11 +1,12 @@
 import http from 'k6/http';
 import { Httpx } from 'https://jslib.k6.io/httpx/0.0.4/index.js';
+import '../config/setup.js';
 
 const tokenEnv = __ENV.TOKEN;
 
 function createApiClient(config) {
     const {
-        baseUrl,
+        baseURL,
         headers,
         timeout,
         authenticationUser,
@@ -14,9 +15,9 @@ function createApiClient(config) {
     } = config;
 
     let session = new Httpx({
-        baseUrl: baseUrl,
+        baseURL: baseURL,
         headers: headers || {},
-        timeout: timeout || 2000,
+        timeout: timeout || 20000,
     });
 
     if (authenticationType) {
@@ -76,7 +77,7 @@ export default class RequestRestBase {
 
     executeRequest() {
         const session = createApiClient({
-            baseUrl: this.baseUrl,
+            baseURL: this.url,
             headers: this.headers,
             timeout: this.timeout,
             authenticationUser: this.authenticationUser,
@@ -96,7 +97,6 @@ export default class RequestRestBase {
 
         let body;
 
-        // Prioridade: formParameters > jsonBody > file
         if (Object.keys(this.formParameters).length > 0) {
             body = this.formParameters;
             requestOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
@@ -107,7 +107,6 @@ export default class RequestRestBase {
             body = {};
             requestOptions.files = {};
             requestOptions.files[this.fileName] = http.file(this.file, this.fileName, this.fileType);
-            // Content-Type será definido automaticamente pelo k6 para multipart
         }
 
         let res;
