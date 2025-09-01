@@ -1,9 +1,10 @@
-import { check } from 'k6';
 import { expect } from 'https://jslib.k6.io/k6-testing/0.5.0/index.js';
 import { Counter } from 'k6/metrics';
 import { Trend } from 'k6/metrics';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import GetActivities from '../../requests/activities/get-activities-request.js';
+import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
+import DeleteAuthor from '../../requests/authors/delete-author-request.js';
+import Utils from '../../utils/utils.js';
 
 export let options = {
     scenarios: {
@@ -29,9 +30,13 @@ const receiveTime = new Trend('receive_time');
 const responseBodySize = new Trend('response_body_size');
 const requestBodySize = new Trend('request_body_size');
 
-export default function getActivity() {
+const id = Utils.readTxt('id-author.txt');
 
-    const request = new GetActivities();
+export default function getAuthorById() {
+
+    const randomId = randomItem(id);
+
+    const request = new DeleteAuthor(randomId);
     const response = request.executeRequest();
 
     if (response.status != 200) {
@@ -57,9 +62,7 @@ export default function getActivity() {
     requestBodySize.add(request.jsonBody ? request.jsonBody.length : 0);
 
     expect(response.status).toEqual(200);
-    check(response, {
-        'Body is not null': (r) => r.body != null,
-    });
+
 };
 
 export function handleSummary(data) {

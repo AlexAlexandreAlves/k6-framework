@@ -4,14 +4,14 @@ const url = __ENV.BASE_URL;
 
 var template = open('../../json-objects/activities/post-activities.json');
 
-export default class SendActivities extends RequestRestBase {
+export default class PostActivities extends RequestRestBase {
 
      constructor() {
         super();
         this.url = url; 
         this.requestService = `/api/v1/Activities`;
         this.setMethod('POST');
-        this.tag = 'SendActivities';
+        this.tag = 'PostActivities';
     }
 
     setJsonBodyFromTemplate(id, title, dueDate, completed) {

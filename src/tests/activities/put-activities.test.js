@@ -2,8 +2,10 @@ import { check } from 'k6';
 import { expect } from 'https://jslib.k6.io/k6-testing/0.5.0/index.js';
 import { Counter } from 'k6/metrics';
 import { Trend } from 'k6/metrics';
+import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import GetActivities from '../../requests/activities/get-activities-request.js';
+import UpdateActivities from '../../requests/activities/put-activities-request.js';
+import Utils from '../../utils/utils.js';
 
 export let options = {
     scenarios: {
@@ -29,11 +31,19 @@ const receiveTime = new Trend('receive_time');
 const responseBodySize = new Trend('response_body_size');
 const requestBodySize = new Trend('request_body_size');
 
-export default function getActivity() {
+const id = Utils.readCsv('id-activity.csv');
 
-    const request = new GetActivities();
+export default function sendActivity() {
+
+    const randomId = randomItem(id);
+    const request = new UpdateActivities(randomId);
+
+    request.setJsonBodyFromTemplate(
+        "Generic title updated",
+        false
+    )
+
     const response = request.executeRequest();
-
     if (response.status != 200) {
         let responseBody = response.body ? response.body : "";
         errorCounter.add(true,
@@ -55,6 +65,8 @@ export default function getActivity() {
     receiveTime.add(response.timings.receiving);
     responseBodySize.add(response.body ? response.body.length : 0);
     requestBodySize.add(request.jsonBody ? request.jsonBody.length : 0);
+
+    console.log("Status code: " + response.status, "Response body: " + response.body);
 
     expect(response.status).toEqual(200);
     check(response, {

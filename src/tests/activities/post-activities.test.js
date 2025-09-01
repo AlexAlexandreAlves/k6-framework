@@ -3,7 +3,7 @@ import { expect } from 'https://jslib.k6.io/k6-testing/0.5.0/index.js';
 import { Counter } from 'k6/metrics';
 import { Trend } from 'k6/metrics';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import SendActivities from '../../requests/activities/post-activities.js';
+import PostActivities from '../../requests/activities/post-activities-request.js';
 
 export let options = {
     scenarios: {
@@ -33,7 +33,7 @@ const requestBodySize = new Trend('request_body_size');
 export default function sendActivity() {
 
     const currentDate = new Date();
-    const request = new SendActivities();
+    const request = new PostActivities();
 
     request.setJsonBodyFromTemplate(
         0,
