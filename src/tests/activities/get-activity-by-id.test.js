@@ -4,7 +4,7 @@ import { Counter } from 'k6/metrics';
 import { Trend } from 'k6/metrics';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
-import GetActivityById from '../../requests/activities/get-activity-by-id.js';
+import GetActivityById from '../../requests/activities/get-activity-by-id-request.js';
 import Utils from '../../utils/utils.js';
 
 export let options = {

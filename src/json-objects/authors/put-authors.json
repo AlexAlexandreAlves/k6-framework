@@ -1,6 +1,4 @@
 {
-  "id": 0,
-  "idBook": "$idBook",
   "firstName": "$firstName",
   "lastName": "$lastName"
 }

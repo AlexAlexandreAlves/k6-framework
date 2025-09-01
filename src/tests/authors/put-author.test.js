@@ -2,8 +2,10 @@ import { check } from 'k6';
 import { expect } from 'https://jslib.k6.io/k6-testing/0.5.0/index.js';
 import { Counter } from 'k6/metrics';
 import { Trend } from 'k6/metrics';
+import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import GetActivities from '../../requests/activities/get-activities-request.js';
+import UpdateAuthors from '../../requests/authors/put-author-request.js';
+import Utils from '../../utils/utils.js';
 
 export let options = {
     scenarios: {
@@ -29,11 +31,22 @@ const receiveTime = new Trend('receive_time');
 const responseBodySize = new Trend('response_body_size');
 const requestBodySize = new Trend('request_body_size');
 
-export default function getActivity() {
+const id = Utils.readCsv('id-author.csv');
+const authorsDataDriven = Utils.readCsv('put-authors.csv');
 
-    const request = new GetActivities();
+export default function updateAuthors() {
+
+    const randomId = randomItem(id);
+    const author = randomItem(authorsDataDriven)
+
+    const request = new UpdateAuthors(randomId);
+
+    request.setJsonBodyFromTemplate(
+        author[0],  // first name
+        author[1]   // last name
+    )
+
     const response = request.executeRequest();
-
     if (response.status != 200) {
         let responseBody = response.body ? response.body : "";
         errorCounter.add(true,
@@ -55,6 +68,8 @@ export default function getActivity() {
     receiveTime.add(response.timings.receiving);
     responseBodySize.add(response.body ? response.body.length : 0);
     requestBodySize.add(request.jsonBody ? request.jsonBody.length : 0);
+
+    console.log("Status code: " + response.status, "Response body: " + response.body);
 
     expect(response.status).toEqual(200);
     check(response, {

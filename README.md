@@ -7,8 +7,7 @@ This project provides a modular architecture for REST API testing using [k6](htt
 ```
 calendar-date-automation-test
 ├── src
-│   ├── auth/
-│   ├── config/
+│   ├── config/              
 │   ├── constants/
 │   ├── core/
 │   │   └── request-rest-base.js
@@ -25,10 +24,37 @@ calendar-date-automation-test
 │   ├── tests/
 │   │   ├── activities/
 │   │   └── authors/
+│   │   └── examples/
 │   └── utils/
 ├── .gitignore
 └── README.md
 ```
+
+## Main Components
+
+- **config:**  
+In this folder, we can create every kind of configuration file, such as the env.json that we can set the BASE_URL of the project, or the setup.js that allows us to initialize every env file before run the test.
+
+- **constants:**  
+Constant files to use on the test files.
+
+- **core:**  
+Here we can find the request-rest-base.js, the main and most important file for this architecture.
+
+- **json-objects:**  
+Define the JSON objects to use them in the tests.
+
+- **requests:**  
+The request builder files, when we can setup the request structure, defining the method (e.g. GET, POST, PUT), the URL, the endpoint and etc.
+
+- **resources:**  
+Resources file to use on the tests, such as *.cvs* or *.txt* files.
+
+- **tests:**  
+Folder where our tests have to be created. *In the examples folder, we can find some kind of executors, that can help you to find the best executor when you'll build your test.*
+
+- **utils:**  
+Utils files, which we can create generic methods to use in all projects. 
 
 ## Architecture
 
@@ -46,26 +72,6 @@ The base class (`src/core/request-rest-base.js`) is designed to support both the
   - Recommended for standard load and performance testing
 
 You can easily adapt the framework to use either client by modifying the base class.
-
-## Main Components
-
-- src/core/request-rest-base.js
-
-Base class for REST requests, supporting GET, POST, PUT, DELETE, authentication, and header configuration.
-
-- src/requests/activities/post-activities.js
-
-Example implementation of a POST request using a JSON template.
-
-- src/utils/utils.js
-
-Utilities for reading CSV and TXT files for test data.
-
-- src/json-objects/
-
-Payload templates for requests, making test parameterization easy.
-
-- src/tests/activities/post-activities.test.js
 
 k6 test script that runs load scenarios and generates an HTML report.
 
@@ -91,4 +97,3 @@ After execution, an HTML report is automatically generated (e.g., report.html).
 ## References
 - k6 Documentation
 - k6 Reporter
--

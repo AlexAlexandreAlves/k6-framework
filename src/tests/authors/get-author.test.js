@@ -3,7 +3,7 @@ import { expect } from 'https://jslib.k6.io/k6-testing/0.5.0/index.js';
 import { Counter } from 'k6/metrics';
 import { Trend } from 'k6/metrics';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import GetActivities from '../../requests/activities/get-activities-request.js';
+import GetAuthors from '../../requests/authors/get-author-request.js';
 
 export let options = {
     scenarios: {
@@ -29,9 +29,9 @@ const receiveTime = new Trend('receive_time');
 const responseBodySize = new Trend('response_body_size');
 const requestBodySize = new Trend('request_body_size');
 
-export default function getActivity() {
+export default function getAuthors() {
 
-    const request = new GetActivities();
+    const request = new GetAuthors();
     const response = request.executeRequest();
 
     if (response.status != 200) {
