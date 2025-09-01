@@ -75,10 +75,14 @@ You can easily adapt the framework to use either client by modifying the base cl
 
 k6 test script that runs load scenarios and generates an HTML report.
 
+## Create your test quickly and easily
+1. Create the request in the [requests-folder](./src/requests) following the same pattern to the other. If you have to use a POST or a PUT request, make sure to define the request body in [json-objects](./src/json-objects). Don't forget it, if you have to use token validation, make sure to include the token in the request headers through the [env.json](./src/config/env.json) variables.
+2. Create a test script in the [tests-folder](./src/tests). This script will import the request and define the test scenario. 
+
 ## How to Run
 
 1. Install [k6](https://k6.io/docs/getting-started/installation/) on your machine.
-2. Set required environment variables, such as `BASE_URL` and `TOKEN`.
+2. Set required environment variables, such as `BASE_URL` and `TOKEN`(if needed).
 3. Run a test as the example with:
 
 ```sh
@@ -93,6 +97,7 @@ After execution, an HTML report is automatically generated (e.g., report.html).
 - Add new JSON templates in src/json-objects/.
 - Implement new requests in src/requests/.
 - Create new test scenarios in src/tests/.
+- Add new [assertions](https://grafana.com/docs/k6/latest/using-k6/assertions/), [validations](https://grafana.com/docs/k6/latest/using-k6/checks/) and [metrics](https://grafana.com/docs/k6/latest/using-k6/metrics/) in src/tests/.
 
 ## References
 - k6 Documentation
