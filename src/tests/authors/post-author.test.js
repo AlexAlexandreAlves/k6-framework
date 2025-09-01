@@ -3,7 +3,9 @@ import { expect } from 'https://jslib.k6.io/k6-testing/0.5.0/index.js';
 import { Counter } from 'k6/metrics';
 import { Trend } from 'k6/metrics';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
+import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 import PostAuthors from '../../requests/authors/post-author-request.js';
+import Utils from '../../utils/utils.js';
 
 export let options = {
     scenarios: {
@@ -30,16 +32,18 @@ const receiveTime = new Trend('receive_time');
 const responseBodySize = new Trend('response_body_size');
 const requestBodySize = new Trend('request_body_size');
 
+const authorsDataDriven = Utils.readCsv('post-author.csv');
+
 export default function sendAuthor() {
 
-    const currentDate = new Date();
+    const author = randomItem(authorsDataDriven)
+
     const request = new PostAuthors();
 
     request.setJsonBodyFromTemplate(
-        0,
-        "Generic title",
-        currentDate,
-        true
+        author[0], // idBook
+        author[1], // firstName
+        author[2], // lastName
     )
 
     const response = request.executeRequest();

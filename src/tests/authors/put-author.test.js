@@ -31,16 +31,19 @@ const receiveTime = new Trend('receive_time');
 const responseBodySize = new Trend('response_body_size');
 const requestBodySize = new Trend('request_body_size');
 
-const id = Utils.readCsv('id-authors.csv');
+const id = Utils.readCsv('id-author.csv');
+const authorsDataDriven = Utils.readCsv('put-authors.csv');
 
-export default function UpdateAuthors() {
+export default function updateAuthors() {
 
     const randomId = randomItem(id);
+    const author = randomItem(authorsDataDriven)
+
     const request = new UpdateAuthors(randomId);
 
     request.setJsonBodyFromTemplate(
-        "Generic title updated",
-        false
+        author[0],  // first name
+        author[1]   // last name
     )
 
     const response = request.executeRequest();

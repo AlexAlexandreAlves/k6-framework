@@ -14,9 +14,8 @@ export default class PostAuthor extends RequestRestBase {
         this.tag = 'PostAuthor';
     }
 
-    setJsonBodyFromTemplate(id, idBook, firstName, lastName) {
+    setJsonBodyFromTemplate(idBook, firstName, lastName) {
         const body = { ...template };
-        body.id = id;
         body.idBook = idBook;
         body.firstName = firstName;
         body.lastName = lastName;
