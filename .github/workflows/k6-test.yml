@@ -13,7 +13,7 @@ jobs:
       image: grafana/k6:latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run k6 tests
         run: |
@@ -22,7 +22,7 @@ jobs:
           if [ -f report.html ]; then mv report.html results/; fi
 
       - name: Upload results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: k6-results
           path: results/
