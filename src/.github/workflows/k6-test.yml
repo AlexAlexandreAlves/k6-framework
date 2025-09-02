@@ -1,0 +1,28 @@
+name: K6 Performance Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  k6-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: grafana/k6:latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run k6 tests
+        run: |
+          mkdir -p results
+          k6 run --out json=results/output.json src/tests/activities/get-activities.test.js
+          if [ -f report.html ]; then mv report.html results/; fi
+
+      - name: Upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-results
+          path: results/
