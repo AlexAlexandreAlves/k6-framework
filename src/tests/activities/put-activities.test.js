@@ -33,7 +33,7 @@ const requestBodySize = new Trend('request_body_size');
 
 const id = Utils.readCsv('id-activity.csv');
 
-export default function sendActivity() {
+export default function updateActivity() {
 
     const randomId = randomItem(id);
     const request = new UpdateActivities(randomId);

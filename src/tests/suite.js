@@ -1,6 +1,13 @@
 import { group } from "k6";
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import sendActivity from '../tests/activities/post-activities.test.js';
+import updateActivity from '../tests/activities/put-activities.test.js';
+import sendAuthor from '../tests/authors/post-author.test.js';
+
+
+/**
+IMPORTANT!
+If you want to control the Load through the suite.js, you have to unconsider the options defined in the individual test files.
+*/
 
 export let options = {
     scenarios: {
@@ -28,13 +35,13 @@ export let options = {
 
 export function createActivity() {
     group('Create Activity', () => {
-        sendActivity();
+        updateActivity();
     });
 }
 
 export function createAuthor() {
     group('Create Author', () => {
-        // Your test logic for creating an author goes here
+        sendAuthor();
     });
 }
 

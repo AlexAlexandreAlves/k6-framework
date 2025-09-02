@@ -30,7 +30,7 @@ const receiveTime = new Trend('receive_time');
 const responseBodySize = new Trend('response_body_size');
 const requestBodySize = new Trend('request_body_size');
 
-export default function sendActivity() {
+export default function createActivity() {
 
     const currentDate = new Date();
     const request = new PostActivities();
