@@ -1,6 +1,7 @@
 import http from 'k6/http';
 import { Httpx } from 'https://jslib.k6.io/httpx/0.0.4/index.js';
 import '../config/setup.js';
+import { recordMetrics } from './metrics-recorder.js'; 
 
 const tokenEnv = __ENV.TOKEN;
 
@@ -85,7 +86,10 @@ export default class RequestRestBase {
             authenticationType: this.authenticationType
         });
 
-        return this._executeRequest(session);
+        const response = this._executeRequest(session);
+        recordMetrics(this, response);
+
+        return response;
     }
 
     _executeRequest(session) {
