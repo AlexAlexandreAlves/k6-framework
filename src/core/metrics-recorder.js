@@ -11,15 +11,18 @@ import {
   requestBodySize,
 } from './metrics.js';
 
+/**
+ * 
+ * @param {RequestMetrics} request - The request metrics object
+ * @param {ResponseMetrics} response - The response metrics object
+ */
 export function recordMetrics(request, response) {
-  if (response.status !== 200) {
-    errorCounter.add(true, {
-      name: request.tag,
-      error_code: response.status,
-      response_body: response.body,
-    });
+  const isSuccess = response.status === 200 && response.status < 300;
+
+  if (isSuccess) {
+    successCounter.add(1, { name: request.tag });
   } else {
-    successCounter.add(true, { name: request.tag });
+    errorCounter.add(1, { name: request.tag, status: String(response.status) });
   }
 
   throughput.add(response.timings.duration);
@@ -29,6 +32,17 @@ export function recordMetrics(request, response) {
   sendTime.add(response.timings.sending);
   receiveTime.add(response.timings.receiving);
 
-  responseBodySize.add(response.body ? response.body.length : 0);
-  requestBodySize.add(request.jsonBody ? request.jsonBody.length : 0);
+  const responseBodyLenght = typeof response.body === 'string'
+    ? response.body.length
+    : response.body
+      ? JSON.stringify(response.body).length
+      : 0;
+  responseBodySize.add(responseBodyLenght);
+
+  const requestBodyLength = typeof request.jsonBody === 'string'
+    ? request.jsonBody.length
+    : request.jsonBody
+      ? JSON.stringify(request.jsonBody).length
+      : 0;
+  requestBodySize.add(requestBodyLength);
 }
