@@ -61,20 +61,24 @@ declare module 'https://jslib.k6.io/papaparse/5.1.1/index.js' {
     export const parse: <T = any>(input: string, config?: ParseConfig) => ParseResult<T>;
 }
 
-declare module 'https://jslib.k6.io/lodash/4.17.15/index.js' {
+declare module 'https://jslib.k6.io/k6-utils/1.1.0/index.js' {
     import { SharedArray } from "k6/data";
     export function randomItem<T>(array: T[] | SharedArray<T>): T;
-
     export function sleep(seconds: number): void;
+}
+
+declare module 'https://jslib.k6.io/http/1.9.0/httpx.js' {
     export function get(url: string): any;
     export function post(url: string, body: any): any;
     export function put(url: string, body: any): any;
     export function patch(url: string, body: any): any;
+}
 
+declare module 'https://jslib.k6.io/httpx/0.0.4/index.js' {
     export interface HttpxConfig {
         baseURL?: string | null;
         headers?: Record<string, string>;
-        timetout?: number;
+        timeout?: number;
     }
 
     export interface HttpxRequestOptions {
@@ -92,6 +96,7 @@ declare module 'https://jslib.k6.io/lodash/4.17.15/index.js' {
         post(url: string, body: any, options?: HttpxRequestOptions): ResponseMetrics;
         put(url: string, body: any, options?: HttpxRequestOptions): ResponseMetrics;
         patch(url: string, body: any, options?: HttpxRequestOptions): ResponseMetrics;
+        delete(url: string, body: any, options?: HttpxRequestOptions): ResponseMetrics;
     }
 }
 

@@ -13,17 +13,21 @@ import {
 
 
 /**
- * 
- * @param {RequestMetrics} request - The request metrics object
- * @param {ResponseMetrics} response - The response metrics object
+ * Record metrics for a request and its response.
+ * @param {RequestMetrics} request - The request object with tag jsonBody
+ * @param {ResponseMetrics} response - The response object with status, body, and timings
  */
 export function recordMetrics(request, response) {
-  const isSuccess = response.status === 200 && response.status < 300;
+  const isSuccess = response.status >= 200 && response.status < 300;
 
   if (isSuccess) {
     successCounter.add(1, { name: request.tag });
   } else {
-    errorCounter.add(1, { name: request.tag, status: String(response.status) });
+    errorCounter.add(1, {
+      name: request.tag,
+      error_code: response.status,
+      response_body: response.body
+    });
   }
 
   throughput.add(response.timings.duration);

@@ -1,9 +1,26 @@
 import http from 'k6/http';
 import { Httpx } from 'https://jslib.k6.io/httpx/0.0.4/index.js';
 import '../config/setup.js';
-import { recordMetrics } from './metrics-recorder.js'; 
+import { recordMetrics } from './metrics-recorder.js';
 
-const tokenEnv = __ENV.TOKEN;
+/**
+ * 
+ * @typedef {Object} ApiClientConfig
+ * @property {string | null } baseURL
+ * @property {Record<string, string>} [headers] 
+ * @property {number} [timeout] 
+ * @property {string | null} [authenticationUser]
+ * @property {string | null} [authenticationPassword]
+ * @property {'BEARER' | 'NONE'} [authenticationType]
+ */
+
+const tokenEnv = __ENV.TOKEN || '';
+
+/**
+ * Creates an Api client with authentication if needed
+ * @param {ApiClientConfig} config - Configuration for the API client
+ * @returns {Httpx} Configured Httpx session
+ */
 
 function createApiClient(config) {
     const {
@@ -35,7 +52,87 @@ function createApiClient(config) {
 
 }
 
+/**
+ * @typedef {'GET' | 'POST' | 'PUT' | 'DELETE'} HttpMethod
+ * @typedef {Object} ResponseMetrics
+ * @property {number} status
+ * @property {string} [body]
+ * @property {Object} timings
+ * @property {number} timings.duration
+ * @property {number} timings.waiting
+ * @property {number} timings.connecting
+ * @property {number} timings.sending
+ * @property {number} timings.receiving
+ */
+
 export default class RequestRestBase {
+    /**
+     * @type {string | null}
+     */
+    url = null;
+    /**
+     * @type {string | null}
+    */
+    requestService = null;
+    /**
+     * @type {HttpMethod | null}
+    */
+    method = null;
+    /**
+     * @type {string | object | null}
+    */
+    jsonBody = null;
+    /**
+     * @type {string | ArrayBuffer | null}
+    */
+    file = null;
+    /**
+     * @type {string | null}
+    */
+    fileName = null;
+    /**
+     * @type {string | null}
+    */
+    fileType = null;
+    /**
+     * @type {Record<string, string>}
+    */
+    headers = { 'Content-Type': 'application/json; charset=utf-8' };
+    /**
+    * @type {Record<string, string>}
+   */
+    cookies = {};
+    /**
+    * @type {Record<string, any>}
+   */
+    queryParameters = {};
+    /**
+    * @type {Record<string, any>}
+   */
+    formParameters = {};
+    /**
+    * @type {'BEARER' | 'NONE'}
+   */
+    authenticationType = 'BEARER';
+    /**
+     * @type {string | null}
+    */
+    authenticationUser = null;
+    /**
+    * @type {string | null}
+   */
+    authenticationPassword = null;
+    /**
+    * @type {string | null}
+   */
+    tag = null;
+    /**
+    * @type {number | undefined}
+   */
+    timeout = undefined;
+
+
+
     constructor() {
         this.url = null;
         this.requestService = null;
@@ -54,28 +151,45 @@ export default class RequestRestBase {
         this.tag = null;
     }
 
+    /** 
+    * @param {HttpMethod} method
+   */
     setMethod(method) {
         this.method = method;
     }
 
+    /** 
+    * @param {Record<string, any>} parameters
+   */
     setFormParameters(parameters) {
         this.formParameters = parameters;
         this.headers['Content-Type'] = 'application/x-www-form-urlencoded';
     }
 
+    /** 
+    * @param {string} header
+   */
     removeHeader(header) {
         delete this.headers[header];
     }
 
+    /** 
+    * @param {string} cookie
+   */
     removeCookie(cookie) {
         delete this.cookies[cookie];
     }
 
+    /** 
+    * @param {string} parameter
+   */
     removeQueryParameter(parameter) {
         delete this.queryParameters[parameter];
     }
 
-
+    /** 
+     * @returns {ResponseMetrics}
+    */
     executeRequest() {
         const session = createApiClient({
             baseURL: this.url,
@@ -92,7 +206,22 @@ export default class RequestRestBase {
         return response;
     }
 
+    /** 
+   * @param {Httpx} session
+   * @returns {ResponseMetrics}
+  */
     _executeRequest(session) {
+        if (!this.requestService) {
+            throw new Error('Request service URL is not defined!');
+        }
+
+        if (!this.tag) {
+            throw new Error('Request tag is not defined!');
+        }
+
+        /** 
+          * @type {{headers: Record<string, string>, cookies: Record<string, string>, params:Record<string, any>, files?: Record<string, any> }} 
+         */
         let requestOptions = {
             headers: { ...this.headers },
             cookies: this.cookies,
@@ -110,7 +239,9 @@ export default class RequestRestBase {
         } else if (this.file) {
             body = {};
             requestOptions.files = {};
+            if(this.fileName && this.fileType) {
             requestOptions.files[this.fileName] = http.file(this.file, this.fileName, this.fileType);
+            }
         }
 
         let res;
